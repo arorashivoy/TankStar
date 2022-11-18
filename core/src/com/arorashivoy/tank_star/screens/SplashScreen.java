@@ -54,7 +54,7 @@ public class SplashScreen implements Screen {
 	}
 
 	public void update(float delta) {
-		if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+		if (Gdx.input.isKeyPressed(Input.Keys.SPACE) || frame > 100) {
 			app.setScreen(new MainMenu(app));
 		}
 		stage.act(delta);
