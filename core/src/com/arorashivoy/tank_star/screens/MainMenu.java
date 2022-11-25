@@ -1,32 +1,82 @@
 package com.arorashivoy.tank_star.screens;
 
+import com.arorashivoy.tank_star.Helper.CustomConstants;
 import com.arorashivoy.tank_star.Main;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 public class MainMenu implements Screen {
 	private Main app;
 	private Stage stage;
+	private Texture background = null;
+	private TextButton playButton;
+	private TextButton resumeButton;
+	private TextButtonStyle textButtonStyle;
 
-	private Image testImage;
+	// Public Constants
+	public static int BTN_WIDTH = 200;
+	public static int BTN_HEIGHT = 100;
+
 	public MainMenu(Main app) {
 		this.app = app;
-		this.stage = new Stage(new FitViewport(Main.V_WIDTH, Main.V_HEIGHT, app.camera));
-		Gdx.input.setInputProcessor(stage);
-
-		Texture testTex = new Texture("badlogic.jpg");
-		testImage = new Image(testTex);
-		testImage.setPosition(stage.getWidth()/2 - 128, stage.getHeight()/2 - 128);
-
-		stage.addActor(testImage);
+		this.stage = new Stage(app.viewport);
+		textButtonStyle = new TextButtonStyle();
 	}
 
 	@Override
 	public void show() {
+		Gdx.input.setInputProcessor(stage);
+
+		// Importing the background image
+		if (app.assets.isLoaded("img/Main_menu.png") && background == null) {
+			Pixmap original = app.assets.get("img/Main_menu.png", Pixmap.class);
+			Pixmap resized = new Pixmap(CustomConstants.V_WIDTH, CustomConstants.V_HEIGHT, original.getFormat());
+			resized.drawPixmap(original, 0, 0, original.getWidth(), original.getHeight(), 0, 0, resized.getWidth(), resized.getHeight());
+			background = new Texture(resized);
+
+			// Disposing the pixmap
+			resized.dispose();
+		}
+
+		// Importing the button textures
+		if (app.assets.isLoaded("img/button-up.png") && app.assets.isLoaded("img/button-down.png")) {
+			Pixmap original_up = app.assets.get("img/button-up.png", Pixmap.class);
+			Pixmap resized_up = new Pixmap(BTN_WIDTH, BTN_HEIGHT, original_up.getFormat());
+			resized_up.drawPixmap(original_up, 0, 0, original_up.getWidth(), original_up.getHeight(), 0, 0, resized_up.getWidth(), resized_up.getHeight());
+			textButtonStyle.up = new TextureRegionDrawable(new Texture(resized_up));
+
+			// Disposing the pixmap
+			resized_up.dispose();
+
+			Pixmap original_down = app.assets.get("img/button-down.png", Pixmap.class);
+			Pixmap resized_down = new Pixmap(BTN_WIDTH, BTN_HEIGHT, original_down.getFormat());
+			resized_down.drawPixmap(original_down, 0, 0, original_down.getWidth(), original_down.getHeight(), 0, 0, resized_down.getWidth(), resized_down.getHeight());
+			textButtonStyle.down = new TextureRegionDrawable(new Texture(resized_down));
+			textButtonStyle.checked = new TextureRegionDrawable(new Texture(resized_down));
+			textButtonStyle.font = app.font;
+
+			// Disposing the pixmap
+			resized_down.dispose();
+
+
+			playButton = new TextButton("Play", textButtonStyle);
+			playButton.setPosition(650,350);
+
+			resumeButton = new TextButton("Resume", textButtonStyle);
+			resumeButton.setPosition(650,200);
+
+			stage.addActor(playButton);
+			stage.addActor(resumeButton);
+		}
 
 	}
 
@@ -35,21 +85,30 @@ public class MainMenu implements Screen {
 		Gdx.gl.glClearColor(.25f, .25f, .25f, 1);
 		Gdx.gl.glClear(Gdx.gl.GL_COLOR_BUFFER_BIT);
 
-		// Drawing stage actors
-		stage.draw();
+		update(delta);
 
 		app.batch.begin();
 		// draw the stuff in SpriteBatch here
+		app.batch.draw(background, 0, 0);
 		app.batch.end();
+
+		// Drawing stage actors
+		stage.draw();
 	}
 
 	public void update(float delta) {
+		playButton.addListener(new ChangeListener() {
+			@Override
+			public void changed (ChangeEvent event, Actor actor) {
+				app.setScreen(app.gameScreen);
+			}
+		});
 		stage.act(delta);
 	}
 
 	@Override
 	public void resize(int width, int height) {
-		stage.getViewport().update(width, height, false);
+		app.viewport.update(width, height, false);
 	}
 
 	@Override
@@ -69,6 +128,7 @@ public class MainMenu implements Screen {
 
 	@Override
 	public void dispose() {
-
+		background.dispose();
+		stage.dispose();
 	}
 }

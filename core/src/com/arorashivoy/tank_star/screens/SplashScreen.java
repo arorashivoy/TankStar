@@ -1,5 +1,6 @@
 package com.arorashivoy.tank_star.screens;
 
+import com.arorashivoy.tank_star.Helper.CustomConstants;
 import com.arorashivoy.tank_star.Main;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -10,31 +11,45 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
-public class SplashScreen implements Screen {
-	private Main app;
-	private Stage stage;
-	int frame = 0;
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.*;
 
-	private Image SplashImage;
+/**
+ * Splash Screen to load the assets
+ */
+public class SplashScreen implements Screen {
+	private final Main app;
+	private Stage stage;
+	private int frame = 0;
+
+	private Image splashImage;
+
 	public SplashScreen(Main app) {
 		this.app = app;
-		this.stage = new Stage(new FitViewport(Main.V_WIDTH, Main.V_HEIGHT, app.camera));
+		this.stage = new Stage(app.viewport);
 		Gdx.input.setInputProcessor(stage);
 
-
+		// Importing the image
 		Pixmap Original = new Pixmap(Gdx.files.internal("img/SplashScreen.png"));
-		Pixmap resized = new Pixmap(Main.V_WIDTH, Main.V_HEIGHT, Original.getFormat());
+		Pixmap resized = new Pixmap(CustomConstants.V_WIDTH, CustomConstants.V_HEIGHT, Original.getFormat());
 		resized.drawPixmap(Original, 0, 0, Original.getWidth(), Original.getHeight(), 0, 0, resized.getWidth(), resized.getHeight());
-		Texture SplashTex = new Texture(resized);
-		SplashImage = new Image(SplashTex);
-		SplashImage.setPosition(0, 0);
+		Texture splashTex = new Texture(resized);
+		splashImage = new Image(splashTex);
 
-		stage.addActor(SplashImage);
+		// Disposing the pix-maps and textures
+		Original.dispose();
+		resized.dispose();
+
+		// Adding the actor
+		stage.addActor(splashImage);
 	}
 
 	@Override
 	public void show() {
+		splashImage.setPosition(0, 0);
+		splashImage.addAction(sequence(alpha(0f), fadeIn(1f)));
 
+		// Queueing the assets
+		queueAssets();
 	}
 
 	@Override
@@ -54,15 +69,15 @@ public class SplashScreen implements Screen {
 	}
 
 	public void update(float delta) {
-		if (Gdx.input.isKeyPressed(Input.Keys.SPACE) || frame > 100) {
-			app.setScreen(new MainMenu(app));
+		if ((Gdx.input.isKeyPressed(Input.Keys.SPACE) || frame > 150) && app.assets.update() && app.font != null) {
+			app.setScreen(app.mainMenu);
 		}
 		stage.act(delta);
 	}
 
 	@Override
 	public void resize(int width, int height) {
-		stage.getViewport().update(width, height, false);
+		app.viewport.update(width, height, false);
 	}
 
 	@Override
@@ -82,6 +97,15 @@ public class SplashScreen implements Screen {
 
 	@Override
 	public void dispose() {
+		stage.dispose();
+	}
 
+	///////////////////////////////////////////////////// HELPERS //////////////////////////////////////////////////////
+	private void queueAssets() {
+		app.assets.load("img/Main_menu.png", Pixmap.class);
+		app.assets.load("img/button-up.png", Pixmap.class);
+		app.assets.load("img/button-down.png", Pixmap.class);
+		app.assets.load("img/Tanks/Frost.PNG", Pixmap.class);
+		app.assets.load("img/background.png", Pixmap.class);
 	}
 }
