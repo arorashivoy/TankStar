@@ -16,9 +16,6 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 
-
-// TODO Add box2D to Stage
-
 public class GameScreen implements Screen {
 	private final Main app;
 	private static final float SCALE = 2f;
@@ -123,7 +120,6 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void resize(int width, int height) {
-		// TODO Set this to resize properly
 		app.viewport.update(width, height, false);
 	}
 
