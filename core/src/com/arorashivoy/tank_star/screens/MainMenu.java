@@ -12,7 +12,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.viewport.FitViewport;
 
 public class MainMenu implements Screen {
 	private Main app;
@@ -37,8 +36,8 @@ public class MainMenu implements Screen {
 		Gdx.input.setInputProcessor(stage);
 
 		// Importing the background image
-		if (app.assets.isLoaded("img/Main_menu.png") && background == null) {
-			Pixmap original = app.assets.get("img/Main_menu.png", Pixmap.class);
+		if (app.assets.isLoaded("img/Backgrounds/Main_menu.png") && background == null) {
+			Pixmap original = app.assets.get("img/Backgrounds/Main_menu.png", Pixmap.class);
 			Pixmap resized = new Pixmap(CustomConstants.V_WIDTH, CustomConstants.V_HEIGHT, original.getFormat());
 			resized.drawPixmap(original, 0, 0, original.getWidth(), original.getHeight(), 0, 0, resized.getWidth(), resized.getHeight());
 			background = new Texture(resized);
@@ -48,24 +47,30 @@ public class MainMenu implements Screen {
 		}
 
 		// Importing the button textures
-		if (app.assets.isLoaded("img/button-up.png") && app.assets.isLoaded("img/button-down.png")) {
-			Pixmap original_up = app.assets.get("img/button-up.png", Pixmap.class);
+		if (app.assets.isLoaded("img/Buttons/button-up.png") && app.assets.isLoaded("img/Buttons/button-down.png") && app.assets.isLoaded("img/Buttons/button-hover.png")) {
+			textButtonStyle.font = app.font;
+
+			// UP
+			Pixmap original_up = app.assets.get("img/Buttons/button-up.png", Pixmap.class);
 			Pixmap resized_up = new Pixmap(BTN_WIDTH, BTN_HEIGHT, original_up.getFormat());
 			resized_up.drawPixmap(original_up, 0, 0, original_up.getWidth(), original_up.getHeight(), 0, 0, resized_up.getWidth(), resized_up.getHeight());
 			textButtonStyle.up = new TextureRegionDrawable(new Texture(resized_up));
-
-			// Disposing the pixmap
 			resized_up.dispose();
 
-			Pixmap original_down = app.assets.get("img/button-down.png", Pixmap.class);
+			// DOWN
+			Pixmap original_down = app.assets.get("img/Buttons/button-down.png", Pixmap.class);
 			Pixmap resized_down = new Pixmap(BTN_WIDTH, BTN_HEIGHT, original_down.getFormat());
 			resized_down.drawPixmap(original_down, 0, 0, original_down.getWidth(), original_down.getHeight(), 0, 0, resized_down.getWidth(), resized_down.getHeight());
 			textButtonStyle.down = new TextureRegionDrawable(new Texture(resized_down));
-			textButtonStyle.checked = new TextureRegionDrawable(new Texture(resized_down));
-			textButtonStyle.font = app.font;
-
-			// Disposing the pixmap
+//			textButtonStyle.checked = new TextureRegionDrawable(new Texture(resized_down));
 			resized_down.dispose();
+
+			// HOVER
+			Pixmap original_hover = app.assets.get("img/Buttons/button-hover.png", Pixmap.class);
+			Pixmap resized_hover = new Pixmap(BTN_WIDTH, BTN_HEIGHT, original_hover.getFormat());
+			resized_hover.drawPixmap(original_hover, 0, 0, original_hover.getWidth(), original_hover.getHeight(), 0, 0, resized_hover.getWidth(), resized_hover.getHeight());
+			textButtonStyle.over = new TextureRegionDrawable(new Texture(resized_hover));
+			resized_hover.dispose();
 
 
 			playButton = new TextButton("Play", textButtonStyle);
@@ -96,7 +101,7 @@ public class MainMenu implements Screen {
 		stage.draw();
 	}
 
-	public void update(float delta) {
+	private void update(float delta) {
 		playButton.addListener(new ChangeListener() {
 			@Override
 			public void changed (ChangeEvent event, Actor actor) {

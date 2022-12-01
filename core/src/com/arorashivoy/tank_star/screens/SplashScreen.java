@@ -7,6 +7,8 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -29,7 +31,7 @@ public class SplashScreen implements Screen {
 		Gdx.input.setInputProcessor(stage);
 
 		// Importing the image
-		Pixmap Original = new Pixmap(Gdx.files.internal("img/SplashScreen.png"));
+		Pixmap Original = new Pixmap(Gdx.files.internal("img/Backgrounds/SplashScreen.png"));
 		Pixmap resized = new Pixmap(CustomConstants.V_WIDTH, CustomConstants.V_HEIGHT, Original.getFormat());
 		resized.drawPixmap(Original, 0, 0, Original.getWidth(), Original.getHeight(), 0, 0, resized.getWidth(), resized.getHeight());
 		Texture splashTex = new Texture(resized);
@@ -101,11 +103,20 @@ public class SplashScreen implements Screen {
 	}
 
 	///////////////////////////////////////////////////// HELPERS //////////////////////////////////////////////////////
+
+	/**
+	 * Add all the assets to be preloaded to the asset manager
+	 */
 	private void queueAssets() {
-		app.assets.load("img/Main_menu.png", Pixmap.class);
-		app.assets.load("img/button-up.png", Pixmap.class);
-		app.assets.load("img/button-down.png", Pixmap.class);
+		app.assets.load("img/Backgrounds/Main_menu.png", Pixmap.class);
+		app.assets.load("img/Buttons/button-up.png", Pixmap.class);
+		app.assets.load("img/Buttons/button-down.png", Pixmap.class);
+		app.assets.load("img/Buttons/button-hover.png", Pixmap.class);
+		app.assets.load("img/Buttons/In_Game_Button.png", Pixmap.class);
+		app.assets.load("img/Buttons/In_Game_Button_hover.png", Pixmap.class);
+		app.assets.load("img/Buttons/In-game-btn.png", Pixmap.class);
+		app.assets.load("img/Buttons/In-game-btn-hover.png", Pixmap.class);
 		app.assets.load("img/Tanks/Frost.PNG", Pixmap.class);
-		app.assets.load("img/background.png", Pixmap.class);
+		app.assets.load("img/Backgrounds/background.png", Pixmap.class);
 	}
 }

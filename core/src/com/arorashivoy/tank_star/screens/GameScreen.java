@@ -13,8 +13,13 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 public class GameScreen implements Screen {
 	private final Main app;
@@ -25,9 +30,12 @@ public class GameScreen implements Screen {
 	private Texture tankTex;
 	private Image bg;
 
+	private TextButtonStyle buttonStyle;
+	private TextButton inGameButton;
+
 	private Stage stage;
 	private Box2DDebugRenderer boxRenderer;
-	private OrthogonalTiledMapRenderer tmr;
+	private OrthogonalTiledMapRenderer mapRenderer;
 	private TiledMap map;
 
 
@@ -39,9 +47,12 @@ public class GameScreen implements Screen {
 		boxRenderer = new Box2DDebugRenderer();
 		tank = createTank(CustomConstants.TANK_WIDTH, 50, CustomConstants.TANK_WIDTH, 3 * CustomConstants.TANK_HEIGHT / 4, false);
 
+		// Button
+		buttonStyle = new TextButtonStyle();
+
 		// Map
 		map = new TmxMapLoader().load("map/test.tmx");
-		tmr = new OrthogonalTiledMapRenderer(map);
+		mapRenderer = new OrthogonalTiledMapRenderer(map);
 
 		TiledObjectBox.parseTiledObjectLayer(world, map.getLayers().get("collision-layer").getObjects());
 	}
@@ -57,7 +68,7 @@ public class GameScreen implements Screen {
 		resized.dispose();
 
 		// Background
-		Pixmap bgOriginal = app.assets.get("img/background.png", Pixmap.class);
+		Pixmap bgOriginal = app.assets.get("img/Backgrounds/background.png", Pixmap.class);
 		Pixmap bgResized = new Pixmap(CustomConstants.V_WIDTH, CustomConstants.V_HEIGHT, bgOriginal.getFormat());
 		bgResized.drawPixmap(bgOriginal, 0, 0, bgOriginal.getWidth(), bgOriginal.getHeight(), 0, 0, bgResized.getWidth(), bgResized.getHeight());
 		Texture bgTex = new Texture(bgResized);
@@ -65,6 +76,31 @@ public class GameScreen implements Screen {
 		bg = new Image(bgTex);
 
 		stage.addActor(bg);
+
+
+		// Button Texture
+		buttonStyle.font = app.font;
+		Pixmap original_up = app.assets.get("img/Buttons/In-game-btn.png", Pixmap.class);
+		Pixmap resized_up = new Pixmap(CustomConstants.IN_GAME_BTN_SIZE, CustomConstants.IN_GAME_BTN_SIZE, original_up.getFormat());
+		resized_up.drawPixmap(original_up, 0, 0, original_up.getWidth(), original_up.getHeight(), 0, 0, resized_up.getWidth(), resized_up.getHeight());
+		buttonStyle.up = new TextureRegionDrawable(new Texture(resized_up));
+		buttonStyle.down = new TextureRegionDrawable(new Texture(resized_up));
+		resized_up.dispose();
+
+		Pixmap original_hover = app.assets.get("img/Buttons/In-game-btn-hover.png", Pixmap.class);
+		Pixmap resized_hover = new Pixmap(CustomConstants.IN_GAME_BTN_SIZE, CustomConstants.IN_GAME_BTN_SIZE, original_hover.getFormat());
+		resized_hover.drawPixmap(original_hover, 0, 0, original_hover.getWidth(), original_hover.getHeight(), 0, 0, resized_hover.getWidth(), resized_hover.getHeight());
+		buttonStyle.over = new TextureRegionDrawable(new Texture(resized_hover));
+		resized_hover.dispose();
+
+		// Button
+		inGameButton = new TextButton("", buttonStyle);
+		inGameButton.setPosition( 0, CustomConstants.V_HEIGHT - CustomConstants.IN_GAME_BTN_SIZE - 10);
+
+		stage.addActor(inGameButton);
+
+
+
 
 	}
 
@@ -76,13 +112,13 @@ public class GameScreen implements Screen {
 
 		update(delta);
 
-		stage.draw();
-		tmr.render();
+		mapRenderer.render();
 		boxRenderer.render(world, app.camera.combined.scl(CustomConstants.PPM));
 
 		app.batch.begin();
 		app.batch.draw(tankTex, (tank.getPosition().x * CustomConstants.PPM) - CustomConstants.TANK_WIDTH / 2f, (tank.getPosition().y * CustomConstants.PPM) - 3 * CustomConstants.TANK_HEIGHT / 5f, CustomConstants.TANK_WIDTH, CustomConstants.TANK_HEIGHT);
 		app.batch.end();
+		stage.draw();
 	}
 
 	public void update(float delta) {
@@ -90,7 +126,13 @@ public class GameScreen implements Screen {
 		stage.act(delta);
 		inputUpdate(delta);
 		cameraUpdate(delta);
-		tmr.setView(app.camera);
+		inGameButton.addListener(new ChangeListener() {
+			@Override
+			public void changed (ChangeEvent event, Actor actor) {
+				System.out.println("Button clicked");
+			}
+		});
+		mapRenderer.setView(app.camera);
 		app.batch.setProjectionMatrix(app.camera.combined);
 	}
 
@@ -142,7 +184,7 @@ public class GameScreen implements Screen {
 	public void dispose() {
 		world.dispose();
 		boxRenderer.dispose();
-		tmr.dispose();
+		mapRenderer.dispose();
 		map.dispose();
 		tankTex.dispose();
 		stage.dispose();

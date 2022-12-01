@@ -15,5 +15,8 @@ public final class CustomConstants {
 	// Tank
 	public static final int TANK_WIDTH = 50;
 	public static final int TANK_HEIGHT = 50;
-	public static final Vector2 TANK_GRAVITY = new Vector2(0, -50f);
+	public static final Vector2 TANK_GRAVITY = new Vector2(0, -75f);
+
+	// Game Screen
+	public static final int IN_GAME_BTN_SIZE = 50;
 }
