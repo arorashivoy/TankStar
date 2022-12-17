@@ -19,7 +19,9 @@ public class GameScreen implements Screen {
 	private final Main app;
 	private static final float SCALE = 2f;
 
-	private Tank tank;
+	private final Tank tank1;
+	private final Tank tank2;
+	private boolean player = false;
 
 	private final TextButtonStyle buttonStyle;
 	private TextButton inGameButton;
@@ -29,7 +31,8 @@ public class GameScreen implements Screen {
 
 	public GameScreen(Main app) {
 		this.app = app;
-		tank = new Tank(app,false, app.world, SCALE);
+		tank1 = new Tank(app,false, app.world, SCALE);
+		tank2 = new Tank(app,true, app.world, SCALE);
 
 		// Button
 		buttonStyle = new TextButtonStyle();
@@ -73,7 +76,8 @@ public class GameScreen implements Screen {
 
 		app.gameStage.addActor(inGameButton);
 
-		tank.show();
+		tank1.show();
+		tank2.show();
 	}
 
 	@Override
@@ -91,7 +95,8 @@ public class GameScreen implements Screen {
 
 		app.batch.begin();
 		// Draw shit here
-		tank.draw(delta);
+		tank1.draw(delta);
+		tank2.draw(delta);
 		app.batch.end();
 	}
 
@@ -107,17 +112,17 @@ public class GameScreen implements Screen {
 
 		app.world.step(1 / 60f, 6, 2);
 		inputUpdate(delta);
-		cameraUpdate(delta);
+		cameraUpdate();
 
 		app.mapRenderer.setView(app.camera);
 		app.batch.setProjectionMatrix(app.camera.combined);
 	}
 
 	private void inputUpdate(float delta) {
-		tank.inputUpdate(delta);
+		tank1.inputUpdate(delta);
 	}
 
-	private void cameraUpdate(float delta) {
+	private void cameraUpdate() {
 		Vector3 position = app.camera.position;
 		position.x = (CustomConstants.V_WIDTH / SCALE);
 		position.y = (CustomConstants.V_HEIGHT / SCALE);
@@ -148,7 +153,8 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void dispose() {
-		tank.dispose();
+		tank1.dispose();
+		tank2.dispose();
 	}
 
 

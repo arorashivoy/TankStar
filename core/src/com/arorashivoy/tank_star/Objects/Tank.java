@@ -13,8 +13,8 @@ import com.badlogic.gdx.physics.box2d.World;
 
 public class Tank {
 	private final Main app;
-	private boolean player;
-	private Body body;
+	private final boolean player;
+	private final Body body;
 	private Texture tankTex;
 
 	public Tank(Main app, boolean player, World world, float SCALE) {
@@ -23,8 +23,14 @@ public class Tank {
 
 
 		BodyDef def = new BodyDef();
+
+		if (player) {
+			def.position.set(CustomConstants.V_WIDTH / (2*CustomConstants.PPM), 200 / CustomConstants.PPM);
+		}else {
+			def.position.set(CustomConstants.TANK_WIDTH / CustomConstants.PPM, 50 / CustomConstants.PPM);
+		}
+
 		def.type = BodyDef.BodyType.DynamicBody;
-		def.position.set(CustomConstants.TANK_WIDTH / CustomConstants.PPM, 50 / CustomConstants.PPM);
 		def.fixedRotation = true;
 		body = world.createBody(def);
 
@@ -40,7 +46,22 @@ public class Tank {
 		Pixmap original = app.assets.get("img/Tanks/Frost.PNG", Pixmap.class);
 		Pixmap resized = new Pixmap(CustomConstants.TANK_WIDTH, CustomConstants.TANK_HEIGHT, original.getFormat());
 		resized.drawPixmap(original, 0, 0, original.getWidth(), original.getHeight(), 0, 0, resized.getWidth(), resized.getHeight());
-		tankTex = new Texture(resized);
+
+		// flipping the tank texture if player two
+		if (player) {
+			Pixmap flipped = new Pixmap(CustomConstants.TANK_WIDTH, CustomConstants.TANK_HEIGHT, resized.getFormat());
+			for (int x = 0; x < CustomConstants.TANK_WIDTH; x++) {
+				for (int y = 0; y < CustomConstants.TANK_HEIGHT; y++) {
+					flipped.drawPixel(x, y, resized.getPixel(CustomConstants.TANK_WIDTH - x - 1, y));
+				}
+			}
+
+			tankTex = new Texture(flipped);
+
+			flipped.dispose();
+		}else {
+			tankTex = new Texture(resized);
+		}
 		resized.dispose();
 	}
 
