@@ -2,6 +2,7 @@ package com.arorashivoy.tank_star.screens;
 
 import com.arorashivoy.tank_star.Helper.CustomConstants;
 import com.arorashivoy.tank_star.Helper.TiledObjectBox;
+import com.arorashivoy.tank_star.Objects.Tank;
 import com.arorashivoy.tank_star.Main;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -28,7 +29,7 @@ public class GameScreen implements Screen {
 	private static final float SCALE = 2f;
 
 	private World world;
-	private Body tank;
+	private Tank tank;
 	private Texture tankTex;
 	private Image bg;
 
@@ -47,7 +48,7 @@ public class GameScreen implements Screen {
 
 		world = new World(CustomConstants.GRAVITY, true);
 		boxRenderer = new Box2DDebugRenderer();
-		tank = createTank(CustomConstants.TANK_WIDTH, 50, CustomConstants.TANK_WIDTH, 3 * CustomConstants.TANK_HEIGHT / 4, false);
+		tank = new Tank(app,false, world, SCALE);
 
 		// Button
 		buttonStyle = new TextButtonStyle();
@@ -123,7 +124,7 @@ public class GameScreen implements Screen {
 		boxRenderer.render(world, app.camera.combined.scl(CustomConstants.PPM));
 
 		app.batch.begin();
-		app.batch.draw(tankTex, (tank.getPosition().x * CustomConstants.PPM) - CustomConstants.TANK_WIDTH / 2f, (tank.getPosition().y * CustomConstants.PPM) - 3 * CustomConstants.TANK_HEIGHT / 5f, CustomConstants.TANK_WIDTH, CustomConstants.TANK_HEIGHT);
+		// Draw shit here
 		app.batch.end();
 	}
 
@@ -201,20 +202,5 @@ public class GameScreen implements Screen {
 
 
 	///////////////////////////////////////////////////// HELPERS //////////////////////////////////////////////////////
-	private Body createTank(int x, int y, int width, int height, Boolean isStatic) {
-		Body body;
-		BodyDef def = new BodyDef();
-		def.type = isStatic ? BodyDef.BodyType.StaticBody : BodyDef.BodyType.DynamicBody;
-		def.position.set(x / CustomConstants.PPM, y / CustomConstants.PPM);
-		def.fixedRotation = true;
-		body = world.createBody(def);
 
-		PolygonShape polygonShape = new PolygonShape();
-		polygonShape.setAsBox(width / (SCALE * CustomConstants.PPM), height / (SCALE * CustomConstants.PPM));
-
-		body.createFixture(polygonShape, 1f);
-		polygonShape.dispose();
-
-		return body;
-	}
 }
