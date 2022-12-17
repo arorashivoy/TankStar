@@ -1,26 +1,17 @@
 package com.arorashivoy.tank_star.screens;
 
 import com.arorashivoy.tank_star.Helper.CustomConstants;
-import com.arorashivoy.tank_star.Helper.TiledObjectBox;
 import com.arorashivoy.tank_star.Objects.Tank;
 import com.arorashivoy.tank_star.Main;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
-import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.physics.box2d.*;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
@@ -28,49 +19,26 @@ public class GameScreen implements Screen {
 	private final Main app;
 	private static final float SCALE = 2f;
 
-	private World world;
 	private Tank tank;
-	private Texture tankTex;
-	private Image bg;
 
-	private TextButtonStyle buttonStyle;
+	private final TextButtonStyle buttonStyle;
 	private TextButton inGameButton;
 
-	private Stage stage;
-	private Box2DDebugRenderer boxRenderer;
-	private OrthogonalTiledMapRenderer mapRenderer;
-	private TiledMap map;
+
 
 
 	public GameScreen(Main app) {
 		this.app = app;
-		this.stage = new Stage(app.viewport);
-
-		world = new World(CustomConstants.GRAVITY, true);
-		boxRenderer = new Box2DDebugRenderer();
-		tank = new Tank(app,false, world, SCALE);
+		tank = new Tank(app,false, app.world, SCALE);
 
 		// Button
 		buttonStyle = new TextButtonStyle();
-
-		// Map
-		map = new TmxMapLoader().load("map/test.tmx");
-		mapRenderer = new OrthogonalTiledMapRenderer(map);
-
-		TiledObjectBox.parseTiledObjectLayer(world, map.getLayers().get("collision-layer").getObjects());
 	}
 
 
 	@Override
 	public void show() {
-		Gdx.input.setInputProcessor(stage);
-
-		// Tank one
-		Pixmap original = app.assets.get("img/Tanks/Frost.PNG", Pixmap.class);
-		Pixmap resized = new Pixmap(CustomConstants.TANK_WIDTH, CustomConstants.TANK_HEIGHT, original.getFormat());
-		resized.drawPixmap(original, 0, 0, original.getWidth(), original.getHeight(), 0, 0, resized.getWidth(), resized.getHeight());
-		tankTex = new Texture(resized);
-		resized.dispose();
+		Gdx.input.setInputProcessor(app.gameStage);
 
 		// Background
 		Pixmap bgOriginal = app.assets.get("img/Backgrounds/background.png", Pixmap.class);
@@ -78,9 +46,9 @@ public class GameScreen implements Screen {
 		bgResized.drawPixmap(bgOriginal, 0, 0, bgOriginal.getWidth(), bgOriginal.getHeight(), 0, 0, bgResized.getWidth(), bgResized.getHeight());
 		Texture bgTex = new Texture(bgResized);
 		bgResized.dispose();
-		bg = new Image(bgTex);
+		Image bg = new Image(bgTex);
 
-		stage.addActor(bg);
+		app.gameStage.addActor(bg);
 
 
 		// Pause Button Texture
@@ -103,11 +71,9 @@ public class GameScreen implements Screen {
 		inGameButton = new TextButton("", buttonStyle);
 		inGameButton.setPosition( 0, CustomConstants.V_HEIGHT - CustomConstants.IN_GAME_BTN_SIZE - 10);
 
-		stage.addActor(inGameButton);
+		app.gameStage.addActor(inGameButton);
 
-
-
-
+		tank.show();
 	}
 
 	@Override
@@ -118,13 +84,14 @@ public class GameScreen implements Screen {
 
 		update(delta);
 
-		stage.draw();
+		app.gameStage.draw();
 
-		mapRenderer.render();
-		boxRenderer.render(world, app.camera.combined.scl(CustomConstants.PPM));
+		app.mapRenderer.render();
+		app.boxRenderer.render(app.world, app.camera.combined.scl(CustomConstants.PPM));
 
 		app.batch.begin();
 		// Draw shit here
+		tank.draw(delta);
 		app.batch.end();
 	}
 
@@ -136,29 +103,18 @@ public class GameScreen implements Screen {
 			}
 		});
 
-		stage.act(delta);
+		app.gameStage.act(delta);
 
-		world.step(1 / 60f, 6, 2);
+		app.world.step(1 / 60f, 6, 2);
 		inputUpdate(delta);
 		cameraUpdate(delta);
 
-		mapRenderer.setView(app.camera);
+		app.mapRenderer.setView(app.camera);
 		app.batch.setProjectionMatrix(app.camera.combined);
 	}
 
 	private void inputUpdate(float delta) {
-		int horizontalForce = 0;
-
-		if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-			horizontalForce -= 1;
-		}
-		if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-			horizontalForce += 1;
-		}
-
-		tank.setLinearVelocity(horizontalForce * 5, tank.getLinearVelocity().y);
-		tank.applyForceToCenter(CustomConstants.TANK_GRAVITY, true);
-
+		tank.inputUpdate(delta);
 	}
 
 	private void cameraUpdate(float delta) {
@@ -192,12 +148,7 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void dispose() {
-		world.dispose();
-		boxRenderer.dispose();
-		mapRenderer.dispose();
-		map.dispose();
-		tankTex.dispose();
-		stage.dispose();
+		tank.dispose();
 	}
 
 

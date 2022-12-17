@@ -10,6 +10,12 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -19,6 +25,12 @@ public class Main extends Game {
 	public Viewport viewport;
 	public AssetManager assets;
 	public BitmapFont font;
+
+	public Stage gameStage;
+	public Box2DDebugRenderer boxRenderer;
+	public World world;
+	public OrthogonalTiledMapRenderer mapRenderer;
+	public TiledMap map;
 
 	////////////////////////////////////////////////////// Screens /////////////////////////////////////////////////////
 	public MainMenu mainMenu;
@@ -33,6 +45,15 @@ public class Main extends Game {
 		batch = new SpriteBatch();
 		assets = new AssetManager();
 
+		// Rendering the game screen elements
+		this.gameStage = new Stage(this.viewport);
+		this.boxRenderer = new Box2DDebugRenderer();
+		this.world = new World(CustomConstants.GRAVITY, true);
+		this.map = new TmxMapLoader().load("map/test.tmx");
+		this.mapRenderer = new OrthogonalTiledMapRenderer(map);
+		TiledObjectBox.parseTiledObjectLayer(this.world, map.getLayers().get("collision-layer").getObjects());
+
+		// Creating Screens
 		splashScreen = new SplashScreen(this);
 		mainMenu = new MainMenu(this);
 		gameScreen = new GameScreen(this);
@@ -49,11 +70,17 @@ public class Main extends Game {
 
 	@Override
 	public void dispose() {
+		splashScreen.dispose();
+		mainMenu.dispose();
+		gameScreen.dispose();
+
 		batch.dispose();
 		assets.dispose();
 
-		splashScreen.dispose();
-		mainMenu.dispose();
+		boxRenderer.dispose();
+		mapRenderer.dispose();
+		map.dispose();
+		gameStage.dispose();
 	}
 
 

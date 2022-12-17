@@ -2,6 +2,10 @@ package com.arorashivoy.tank_star.Objects;
 
 import com.arorashivoy.tank_star.Helper.CustomConstants;
 import com.arorashivoy.tank_star.Main;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
@@ -10,7 +14,8 @@ import com.badlogic.gdx.physics.box2d.World;
 public class Tank {
 	private final Main app;
 	private boolean player;
-	Body body;
+	private Body body;
+	private Texture tankTex;
 
 	public Tank(Main app, boolean player, World world, float SCALE) {
 		this.player = player;
@@ -30,9 +35,35 @@ public class Tank {
 		polygonShape.dispose();
 	}
 
-	public void render(float delta) {
-		app.batch.begin();
+	public void show() {
+		// Tank texture
+		Pixmap original = app.assets.get("img/Tanks/Frost.PNG", Pixmap.class);
+		Pixmap resized = new Pixmap(CustomConstants.TANK_WIDTH, CustomConstants.TANK_HEIGHT, original.getFormat());
+		resized.drawPixmap(original, 0, 0, original.getWidth(), original.getHeight(), 0, 0, resized.getWidth(), resized.getHeight());
+		tankTex = new Texture(resized);
+		resized.dispose();
+	}
+
+	public void draw(float delta) {
 		app.batch.draw(tankTex, (body.getPosition().x * CustomConstants.PPM) - CustomConstants.TANK_WIDTH / 2f, (body.getPosition().y * CustomConstants.PPM) - 3 * CustomConstants.TANK_HEIGHT / 5f, CustomConstants.TANK_WIDTH, CustomConstants.TANK_HEIGHT);
-		app.batch.end();
+	}
+
+	public void inputUpdate(float delta) {
+		int horizontalForce = 0;
+
+		if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+			horizontalForce -= 1;
+		}
+		if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+			horizontalForce += 1;
+		}
+
+		body.setLinearVelocity(horizontalForce * 5, body.getLinearVelocity().y);
+		body.applyForceToCenter(CustomConstants.TANK_GRAVITY, true);
+
+	}
+
+	public void dispose() {
+		tankTex.dispose();
 	}
 }
