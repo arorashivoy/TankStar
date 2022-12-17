@@ -115,7 +115,7 @@ public class SplashScreen implements Screen {
 		app.assets.load("img/Buttons/In_Game_Button.png", Pixmap.class);
 		app.assets.load("img/Buttons/In_Game_Button_hover.png", Pixmap.class);
 		app.assets.load("img/Buttons/In-game-btn.png", Pixmap.class);
-		app.assets.load("img/Buttons/In-game-btn-hover.png", Pixmap.class);
+		app.assets.load("img/Buttons/In-game-btn-down.png", Pixmap.class);
 		app.assets.load("img/Tanks/Frost.PNG", Pixmap.class);
 		app.assets.load("img/Backgrounds/background.png", Pixmap.class);
 	}

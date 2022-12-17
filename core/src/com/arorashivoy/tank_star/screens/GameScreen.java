@@ -14,11 +14,13 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 public class GameScreen implements Screen {
@@ -60,6 +62,8 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void show() {
+		Gdx.input.setInputProcessor(stage);
+
 		// Tank one
 		Pixmap original = app.assets.get("img/Tanks/Frost.PNG", Pixmap.class);
 		Pixmap resized = new Pixmap(CustomConstants.TANK_WIDTH, CustomConstants.TANK_HEIGHT, original.getFormat());
@@ -78,20 +82,21 @@ public class GameScreen implements Screen {
 		stage.addActor(bg);
 
 
-		// Button Texture
+		// Pause Button Texture
 		buttonStyle.font = app.font;
 		Pixmap original_up = app.assets.get("img/Buttons/In-game-btn.png", Pixmap.class);
 		Pixmap resized_up = new Pixmap(CustomConstants.IN_GAME_BTN_SIZE, CustomConstants.IN_GAME_BTN_SIZE, original_up.getFormat());
 		resized_up.drawPixmap(original_up, 0, 0, original_up.getWidth(), original_up.getHeight(), 0, 0, resized_up.getWidth(), resized_up.getHeight());
 		buttonStyle.up = new TextureRegionDrawable(new Texture(resized_up));
-		buttonStyle.down = new TextureRegionDrawable(new Texture(resized_up));
+
 		resized_up.dispose();
 
-		Pixmap original_hover = app.assets.get("img/Buttons/In-game-btn-hover.png", Pixmap.class);
-		Pixmap resized_hover = new Pixmap(CustomConstants.IN_GAME_BTN_SIZE, CustomConstants.IN_GAME_BTN_SIZE, original_hover.getFormat());
-		resized_hover.drawPixmap(original_hover, 0, 0, original_hover.getWidth(), original_hover.getHeight(), 0, 0, resized_hover.getWidth(), resized_hover.getHeight());
-		buttonStyle.over = new TextureRegionDrawable(new Texture(resized_hover));
-		resized_hover.dispose();
+		Pixmap original_down = app.assets.get("img/Buttons/In-game-btn-down.png", Pixmap.class);
+		Pixmap resized_down = new Pixmap(CustomConstants.IN_GAME_BTN_SIZE, CustomConstants.IN_GAME_BTN_SIZE, original_down.getFormat());
+		resized_down.drawPixmap(original_down, 0, 0, original_down.getWidth(), original_down.getHeight(), 0, 0, resized_down.getWidth(), resized_down.getHeight());
+		buttonStyle.down = new TextureRegionDrawable(new Texture(resized_down));
+		buttonStyle.over = new TextureRegionDrawable(new Texture(resized_down));
+		resized_down.dispose();
 
 		// Button
 		inGameButton = new TextButton("", buttonStyle);
@@ -112,26 +117,30 @@ public class GameScreen implements Screen {
 
 		update(delta);
 
+		stage.draw();
+
 		mapRenderer.render();
 		boxRenderer.render(world, app.camera.combined.scl(CustomConstants.PPM));
 
 		app.batch.begin();
 		app.batch.draw(tankTex, (tank.getPosition().x * CustomConstants.PPM) - CustomConstants.TANK_WIDTH / 2f, (tank.getPosition().y * CustomConstants.PPM) - 3 * CustomConstants.TANK_HEIGHT / 5f, CustomConstants.TANK_WIDTH, CustomConstants.TANK_HEIGHT);
 		app.batch.end();
-		stage.draw();
 	}
 
 	public void update(float delta) {
-		world.step(1 / 60f, 6, 2);
-		stage.act(delta);
-		inputUpdate(delta);
-		cameraUpdate(delta);
-		inGameButton.addListener(new ChangeListener() {
+		inGameButton.addListener(new ClickListener() {
 			@Override
-			public void changed (ChangeEvent event, Actor actor) {
+			public void clicked (InputEvent event, float x, float y) {
 				System.out.println("Button clicked");
 			}
 		});
+
+		stage.act(delta);
+
+		world.step(1 / 60f, 6, 2);
+		inputUpdate(delta);
+		cameraUpdate(delta);
+
 		mapRenderer.setView(app.camera);
 		app.batch.setProjectionMatrix(app.camera.combined);
 	}
