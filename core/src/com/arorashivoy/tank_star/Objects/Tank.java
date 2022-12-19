@@ -1,11 +1,15 @@
 package com.arorashivoy.tank_star.Objects;
 
-import com.arorashivoy.tank_star.Helper.CustomConstants;
+import static com.arorashivoy.tank_star.Helper.CustomConstants.*;
+
 import com.arorashivoy.tank_star.Main;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
@@ -15,7 +19,12 @@ public class Tank {
 	private final Main app;
 	private final boolean player;
 	private final Body body;
-	private Texture tankTex;
+	private Sprite tankSprite;
+	private boolean chance = true;
+	private float angle;
+	private float power = 50f;
+	private float health = INITIAL_HEALTH;
+	private float fuel = INITIAL_FUEL;
 
 	public Tank(Main app, boolean player, World world, float SCALE) {
 		this.player = player;
@@ -25,9 +34,11 @@ public class Tank {
 		BodyDef def = new BodyDef();
 
 		if (player) {
-			def.position.set(CustomConstants.V_WIDTH / (2*CustomConstants.PPM), 200 / CustomConstants.PPM);
-		}else {
-			def.position.set(CustomConstants.TANK_WIDTH / CustomConstants.PPM, 50 / CustomConstants.PPM);
+			angle = 180f;
+			def.position.set(V_WIDTH / (2 * PPM), 200 / PPM);
+		} else {
+			angle = 0f;
+			def.position.set(TANK_WIDTH / PPM, 50 / PPM);
 		}
 
 		def.type = BodyDef.BodyType.DynamicBody;
@@ -35,56 +46,118 @@ public class Tank {
 		body = world.createBody(def);
 
 		PolygonShape polygonShape = new PolygonShape();
-		polygonShape.setAsBox(CustomConstants.TANK_WIDTH / (SCALE * CustomConstants.PPM), 3 * CustomConstants.TANK_HEIGHT / 4 / (SCALE * CustomConstants.PPM));
+		polygonShape.setAsBox(TANK_WIDTH / (SCALE * PPM), (3 / 4f) * TANK_HEIGHT / (SCALE * PPM));
 
 		body.createFixture(polygonShape, 1f);
 		polygonShape.dispose();
 	}
 
 	public void show() {
-		// Tank texture
-		Pixmap original = app.assets.get("img/Tanks/Frost.PNG", Pixmap.class);
-		Pixmap resized = new Pixmap(CustomConstants.TANK_WIDTH, CustomConstants.TANK_HEIGHT, original.getFormat());
-		resized.drawPixmap(original, 0, 0, original.getWidth(), original.getHeight(), 0, 0, resized.getWidth(), resized.getHeight());
+		// Tank Texture
+		Texture tankTex = app.assets.get("img/Tanks/Frost.PNG", Texture.class);
+		tankSprite = new Sprite(tankTex);
 
-		// flipping the tank texture if player two
 		if (player) {
-			Pixmap flipped = new Pixmap(CustomConstants.TANK_WIDTH, CustomConstants.TANK_HEIGHT, resized.getFormat());
-			for (int x = 0; x < CustomConstants.TANK_WIDTH; x++) {
-				for (int y = 0; y < CustomConstants.TANK_HEIGHT; y++) {
-					flipped.drawPixel(x, y, resized.getPixel(CustomConstants.TANK_WIDTH - x - 1, y));
-				}
-			}
-
-			tankTex = new Texture(flipped);
-
-			flipped.dispose();
-		}else {
-			tankTex = new Texture(resized);
+			tankSprite.flip(true, false);
 		}
-		resized.dispose();
+
+		tankSprite.setSize(TANK_WIDTH, TANK_HEIGHT);
+
 	}
 
 	public void draw(float delta) {
-		app.batch.draw(tankTex, (body.getPosition().x * CustomConstants.PPM) - CustomConstants.TANK_WIDTH / 2f, (body.getPosition().y * CustomConstants.PPM) - 3 * CustomConstants.TANK_HEIGHT / 5f, CustomConstants.TANK_WIDTH, CustomConstants.TANK_HEIGHT);
+		updateTankSprite();
+
+		// For shooting
+		if (chance) {
+			app.shapeRenderer.setProjectionMatrix(app.camera.combined);
+			app.shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+			app.shapeRenderer.setColor(Color.GRAY);
+			app.shapeRenderer.rect(body.getPosition().x, body.getPosition().y, 0, 0, power / PPM, 2 / PPM, 1f, 1f, angle);
+			app.shapeRenderer.end();
+		}
+
+		// Health bar
+//		app.shapeRenderer.setProjectionMatrix(app.camera.combined);
+		app.shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+		app.shapeRenderer.setColor(Color.BLUE);
+		app.shapeRenderer.rect((player ? 500 : 150) / PPM, (V_HEIGHT - 50) / PPM, 0, 0, health * 3 / PPM, 20 / PPM, 1f, 1f, 0f);
+		app.shapeRenderer.end();
+
+
+		// fuel bar
+		app.shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+		app.shapeRenderer.setColor(Color.YELLOW);
+		app.shapeRenderer.rect((player ? V_WIDTH - 50 - INITIAL_FUEL : 50) / PPM, 10 / PPM, 0, 0, fuel / PPM, 20 / PPM, 1f, 1f, 0f);
+		app.shapeRenderer.end();
+
+
+		app.batch.begin();
+		tankSprite.draw(app.batch);
+		app.batch.end();
+	}
+
+
+	private void updateTankSprite() {
+		tankSprite.setPosition((body.getPosition().x * PPM) - TANK_WIDTH / 2f, (body.getPosition().y * PPM) - 3 * TANK_HEIGHT / 5f);
 	}
 
 	public void inputUpdate(float delta) {
 		int horizontalForce = 0;
 
-		if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+		// Move forward Backward
+		if (Gdx.input.isKeyPressed(Input.Keys.LEFT) && fuel > 0) {
 			horizontalForce -= 1;
+			fuel -= 2f;
 		}
-		if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+		if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) && fuel > 0) {
 			horizontalForce += 1;
+			fuel -= 2f;
 		}
+
+		// Set bullet angle
+		if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+			angle += (player) ? -1 : 1;
+		}
+		if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+			angle -= (player) ? -1 : 1;
+		}
+
+		// Set bullet power
+		if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+			if (power >= 30 && power <= 100) {
+				power -= (player) ? -1 : 1;
+			}
+		}
+		if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+			if (power <= 100 && power >= 30) {
+				power += (player) ? -1 : 1;
+			}
+		}
+
 
 		body.setLinearVelocity(horizontalForce * 5, body.getLinearVelocity().y);
-		body.applyForceToCenter(CustomConstants.TANK_GRAVITY, true);
-
 	}
 
 	public void dispose() {
-		tankTex.dispose();
+		tankSprite.getTexture().dispose();
+	}
+
+
+	////////////////////////////////////////////////// Getter Setter ///////////////////////////////////////////////////
+	public Vector2 getPosition() {
+		return body.getPosition();
+	}
+
+	public void setChance(boolean chance) {
+		this.chance = chance;
+	}
+
+	public Body getBody() {
+		return body;
+	}
+
+	public void resetFuel() {
+		fuel = INITIAL_FUEL;
 	}
 }

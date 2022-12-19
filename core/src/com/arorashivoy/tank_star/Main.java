@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
@@ -25,6 +26,7 @@ public class Main extends Game {
 	public Viewport viewport;
 	public AssetManager assets;
 	public BitmapFont font;
+	public ShapeRenderer shapeRenderer;
 
 	public Stage gameStage;
 	public Box2DDebugRenderer boxRenderer;
@@ -44,6 +46,7 @@ public class Main extends Game {
 		viewport = new FitViewport(CustomConstants.V_WIDTH, CustomConstants.V_HEIGHT, camera);
 		batch = new SpriteBatch();
 		assets = new AssetManager();
+		shapeRenderer = new ShapeRenderer();
 
 		// Rendering the game screen elements
 		this.gameStage = new Stage(this.viewport);

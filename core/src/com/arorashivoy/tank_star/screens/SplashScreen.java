@@ -7,11 +7,8 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.utils.viewport.FitViewport;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.*;
 
@@ -116,7 +113,7 @@ public class SplashScreen implements Screen {
 		app.assets.load("img/Buttons/In_Game_Button_hover.png", Pixmap.class);
 		app.assets.load("img/Buttons/In-game-btn.png", Pixmap.class);
 		app.assets.load("img/Buttons/In-game-btn-down.png", Pixmap.class);
-		app.assets.load("img/Tanks/Frost.PNG", Pixmap.class);
+		app.assets.load("img/Tanks/Frost.PNG", Texture.class);
 		app.assets.load("img/Backgrounds/background.png", Pixmap.class);
 	}
 }

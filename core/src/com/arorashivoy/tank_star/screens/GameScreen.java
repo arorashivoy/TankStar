@@ -1,9 +1,10 @@
 package com.arorashivoy.tank_star.screens;
 
-import com.arorashivoy.tank_star.Helper.CustomConstants;
+import static com.arorashivoy.tank_star.Helper.CustomConstants.*;
 import com.arorashivoy.tank_star.Objects.Tank;
 import com.arorashivoy.tank_star.Main;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -45,7 +46,7 @@ public class GameScreen implements Screen {
 
 		// Background
 		Pixmap bgOriginal = app.assets.get("img/Backgrounds/background.png", Pixmap.class);
-		Pixmap bgResized = new Pixmap(CustomConstants.V_WIDTH, CustomConstants.V_HEIGHT, bgOriginal.getFormat());
+		Pixmap bgResized = new Pixmap(V_WIDTH, V_HEIGHT, bgOriginal.getFormat());
 		bgResized.drawPixmap(bgOriginal, 0, 0, bgOriginal.getWidth(), bgOriginal.getHeight(), 0, 0, bgResized.getWidth(), bgResized.getHeight());
 		Texture bgTex = new Texture(bgResized);
 		bgResized.dispose();
@@ -57,14 +58,14 @@ public class GameScreen implements Screen {
 		// Pause Button Texture
 		buttonStyle.font = app.font;
 		Pixmap original_up = app.assets.get("img/Buttons/In-game-btn.png", Pixmap.class);
-		Pixmap resized_up = new Pixmap(CustomConstants.IN_GAME_BTN_SIZE, CustomConstants.IN_GAME_BTN_SIZE, original_up.getFormat());
+		Pixmap resized_up = new Pixmap(IN_GAME_BTN_SIZE, IN_GAME_BTN_SIZE, original_up.getFormat());
 		resized_up.drawPixmap(original_up, 0, 0, original_up.getWidth(), original_up.getHeight(), 0, 0, resized_up.getWidth(), resized_up.getHeight());
 		buttonStyle.up = new TextureRegionDrawable(new Texture(resized_up));
 
 		resized_up.dispose();
 
 		Pixmap original_down = app.assets.get("img/Buttons/In-game-btn-down.png", Pixmap.class);
-		Pixmap resized_down = new Pixmap(CustomConstants.IN_GAME_BTN_SIZE, CustomConstants.IN_GAME_BTN_SIZE, original_down.getFormat());
+		Pixmap resized_down = new Pixmap(IN_GAME_BTN_SIZE, IN_GAME_BTN_SIZE, original_down.getFormat());
 		resized_down.drawPixmap(original_down, 0, 0, original_down.getWidth(), original_down.getHeight(), 0, 0, resized_down.getWidth(), resized_down.getHeight());
 		buttonStyle.down = new TextureRegionDrawable(new Texture(resized_down));
 		buttonStyle.over = new TextureRegionDrawable(new Texture(resized_down));
@@ -72,7 +73,8 @@ public class GameScreen implements Screen {
 
 		// Button
 		inGameButton = new TextButton("", buttonStyle);
-		inGameButton.setPosition( 0, CustomConstants.V_HEIGHT - CustomConstants.IN_GAME_BTN_SIZE - 10);
+		inGameButton.setPosition( 0, V_HEIGHT - IN_GAME_BTN_SIZE - 10);
+
 
 		app.gameStage.addActor(inGameButton);
 
@@ -91,13 +93,11 @@ public class GameScreen implements Screen {
 		app.gameStage.draw();
 
 		app.mapRenderer.render();
-		app.boxRenderer.render(app.world, app.camera.combined.scl(CustomConstants.PPM));
+		app.boxRenderer.render(app.world, app.camera.combined.scl(PPM));
 
-		app.batch.begin();
-		// Draw shit here
+
 		tank1.draw(delta);
 		tank2.draw(delta);
-		app.batch.end();
 	}
 
 	public void update(float delta) {
@@ -116,16 +116,33 @@ public class GameScreen implements Screen {
 
 		app.mapRenderer.setView(app.camera);
 		app.batch.setProjectionMatrix(app.camera.combined);
+
+
+		tank1.setChance(!player);
+		tank2.setChance(player);
 	}
 
 	private void inputUpdate(float delta) {
-		tank1.inputUpdate(delta);
+		if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+			player = !player;
+			tank1.resetFuel();
+			tank2.resetFuel();
+		}
+		if (player) {
+			tank2.inputUpdate(delta);
+		}
+		else {
+			tank1.inputUpdate(delta);
+		}
+
+		tank1.getBody().applyForceToCenter(TANK_GRAVITY, true);
+		tank2.getBody().applyForceToCenter(TANK_GRAVITY, true);
 	}
 
 	private void cameraUpdate() {
 		Vector3 position = app.camera.position;
-		position.x = (CustomConstants.V_WIDTH / SCALE);
-		position.y = (CustomConstants.V_HEIGHT / SCALE);
+		position.x = (V_WIDTH / SCALE);
+		position.y = (V_HEIGHT / SCALE);
 		app.camera.position.set(position);
 
 		app.camera.update();
