@@ -12,7 +12,7 @@ public class Bullets
 {
      private final Main app;
      private boolean player;
-     private boolean isVisible = true;
+     private boolean isVisible = false;
      Body body;
     //private size, type, texture,
     public Bullets(Main app, boolean player, World world, float SCALE)
