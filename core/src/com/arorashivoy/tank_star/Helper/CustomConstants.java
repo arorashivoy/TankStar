@@ -22,8 +22,8 @@ public final class CustomConstants {
 	// Bullet
 	public static final int BULLET_WIDTH = 10;
 	public static final int BULLET_HEIGHT = 10;
+	public static final float BULLET_UNIT_TIME = 0.005f;
 
 	// Game Screen
 	public static final int IN_GAME_BTN_SIZE = 70;
-	public static final int FIRE_DETAIL_PANEL_SIZE = 150;
 }

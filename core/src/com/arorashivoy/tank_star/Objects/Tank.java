@@ -1,6 +1,7 @@
 package com.arorashivoy.tank_star.Objects;
 
 import static com.arorashivoy.tank_star.Helper.CustomConstants.*;
+import static java.lang.Math.*;
 
 import com.arorashivoy.tank_star.Main;
 import com.badlogic.gdx.Gdx;
@@ -25,12 +26,18 @@ public class Tank {
 	private float power = 50f;
 	private float health = INITIAL_HEALTH;
 	private float fuel = INITIAL_FUEL;
+	private final Bullets bullet;
+	private boolean isFiring = false;
 
 	public Tank(Main app, boolean player, World world, float SCALE) {
 		this.player = player;
 		this.app = app;
 
+		// Bullet
+		bullet = new Bullets(app, this);
 
+
+		// Box2D Body
 		BodyDef def = new BodyDef();
 
 		if (player) {
@@ -63,8 +70,11 @@ public class Tank {
 
 		tankSprite.setSize(TANK_WIDTH, TANK_HEIGHT);
 
+		bullet.show();
+
 	}
 
+	@SuppressWarnings("unused")
 	public void draw(float delta) {
 		updateTankSprite();
 
@@ -78,7 +88,6 @@ public class Tank {
 		}
 
 		// Health bar
-//		app.shapeRenderer.setProjectionMatrix(app.camera.combined);
 		app.shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 		app.shapeRenderer.setColor(Color.BLUE);
 		app.shapeRenderer.rect((player ? 500 : 150) / PPM, (V_HEIGHT - 50) / PPM, 0, 0, health * 3 / PPM, 20 / PPM, 1f, 1f, 0f);
@@ -102,6 +111,7 @@ public class Tank {
 		tankSprite.setPosition((body.getPosition().x * PPM) - TANK_WIDTH / 2f, (body.getPosition().y * PPM) - 3 * TANK_HEIGHT / 5f);
 	}
 
+	@SuppressWarnings("unused")
 	public void inputUpdate(float delta) {
 		int horizontalForce = 0;
 
@@ -141,14 +151,27 @@ public class Tank {
 
 	public void dispose() {
 		tankSprite.getTexture().dispose();
+		bullet.dispose();
 	}
 
+	public void shoot() {
+		bullet.fire(body.getPosition().x, body.getPosition().y, power * cos(angle), power * sin(angle));
+		isFiring = true;
+	}
+
+	public void setFiring(boolean firing) {
+		isFiring = firing;
+	}
+
+	public boolean isFiring() {
+		return isFiring;
+	}
+
+	public void drawBullet() {
+		bullet.draw();
+	}
 
 	////////////////////////////////////////////////// Getter Setter ///////////////////////////////////////////////////
-	public Vector2 getPosition() {
-		return body.getPosition();
-	}
-
 	public void setChance(boolean chance) {
 		this.chance = chance;
 	}
@@ -159,5 +182,14 @@ public class Tank {
 
 	public void resetFuel() {
 		fuel = INITIAL_FUEL;
+	}
+
+	///////////////////////////////////////////////////// HELPERS //////////////////////////////////////////////////////
+	public void checkDamage(float x, float y) {
+		double damageX = pow(2.71, x*x);
+		double damageY = pow(2.71, y*y);
+
+		health -= (damageX + damageY);
+		System.out.println(damageX + damageY);
 	}
 }

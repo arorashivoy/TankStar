@@ -17,10 +17,10 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.*;
  */
 public class SplashScreen implements Screen {
 	private final Main app;
-	private Stage stage;
+	private final Stage stage;
 	private int frame = 0;
 
-	private Image splashImage;
+	private final Image splashImage;
 
 	public SplashScreen(Main app) {
 		this.app = app;
@@ -115,5 +115,6 @@ public class SplashScreen implements Screen {
 		app.assets.load("img/Buttons/In-game-btn-down.png", Pixmap.class);
 		app.assets.load("img/Tanks/Frost.PNG", Texture.class);
 		app.assets.load("img/Backgrounds/background.png", Pixmap.class);
+		app.assets.load("img/Bullets/Bullet.png", Texture.class);
 	}
 }

@@ -92,6 +92,11 @@ public class GameScreen implements Screen {
 
 		app.gameStage.draw();
 
+		app.batch.begin();
+		tank1.drawBullet();
+		tank2.drawBullet();
+		app.batch.end();
+
 		app.mapRenderer.render();
 		app.boxRenderer.render(app.world, app.camera.combined.scl(PPM));
 
@@ -123,7 +128,22 @@ public class GameScreen implements Screen {
 	}
 
 	private void inputUpdate(float delta) {
+		// Setting gravity for tanks
+		tank1.getBody().applyForceToCenter(TANK_GRAVITY, true);
+		tank2.getBody().applyForceToCenter(TANK_GRAVITY, true);
+
+		// checking if any is firing
+		if (tank1.isFiring() || tank2.isFiring()) {
+			return;
+		}
+
+		// key presses
 		if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+			if (!player) {
+				tank1.shoot();
+			} else {
+				tank2.shoot();
+			}
 			player = !player;
 			tank1.resetFuel();
 			tank2.resetFuel();
@@ -134,9 +154,6 @@ public class GameScreen implements Screen {
 		else {
 			tank1.inputUpdate(delta);
 		}
-
-		tank1.getBody().applyForceToCenter(TANK_GRAVITY, true);
-		tank2.getBody().applyForceToCenter(TANK_GRAVITY, true);
 	}
 
 	private void cameraUpdate() {
@@ -176,5 +193,11 @@ public class GameScreen implements Screen {
 
 
 	///////////////////////////////////////////////////// HELPERS //////////////////////////////////////////////////////
+
+	public void checkCollision(float x, float y) {
+		tank1.checkDamage(x, y);
+		tank2.checkDamage(x, y);
+	}
+
 
 }

@@ -14,12 +14,12 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 public class MainMenu implements Screen {
-	private Main app;
-	private Stage stage;
+	private final Main app;
+	private final Stage stage;
 	private Texture background = null;
 	private TextButton playButton;
 	private TextButton resumeButton;
-	private TextButtonStyle textButtonStyle;
+	private final TextButtonStyle textButtonStyle;
 
 	// Public Constants
 	public static int BTN_WIDTH = 200;
