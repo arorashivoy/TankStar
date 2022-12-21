@@ -57,7 +57,7 @@ public class Main extends Game {
 		TiledObjectBox.parseTiledObjectLayer(this.world, map.getLayers().get("collision-layer").getObjects());
 
 		// Creating Screens
-		splashScreen = new SplashScreen(this);
+		splashScreen = SplashScreen.getInstance(this);
 		mainMenu = new MainMenu(this);
 		gameScreen = new GameScreen(this);
 

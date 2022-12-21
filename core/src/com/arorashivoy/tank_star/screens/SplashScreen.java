@@ -19,10 +19,11 @@ public class SplashScreen implements Screen {
 	private final Main app;
 	private final Stage stage;
 	private int frame = 0;
+	private static SplashScreen instance = null;
 
 	private final Image splashImage;
 
-	public SplashScreen(Main app) {
+	private SplashScreen(Main app) {
 		this.app = app;
 		this.stage = new Stage(app.viewport);
 		Gdx.input.setInputProcessor(stage);
@@ -41,6 +42,15 @@ public class SplashScreen implements Screen {
 		// Adding the actor
 		stage.addActor(splashImage);
 	}
+
+	public static SplashScreen getInstance(Main app) {
+		if (instance == null) {
+			instance = new SplashScreen(app);
+		}
+		return instance;
+	}
+
+
 
 	@Override
 	public void show() {

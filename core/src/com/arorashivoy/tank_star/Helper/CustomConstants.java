@@ -18,11 +18,13 @@ public final class CustomConstants {
 	public static final Vector2 TANK_GRAVITY = new Vector2(0, -75f);
 	public static final float INITIAL_HEALTH = 100f;
 	public static final float INITIAL_FUEL = 100f;
+	public static final double DAMAGE_CONST = 0.5f;
 
 	// Bullet
 	public static final int BULLET_WIDTH = 10;
 	public static final int BULLET_HEIGHT = 10;
 	public static final float BULLET_UNIT_TIME = 0.005f;
+	public static final int FRAME_SKIP = 20;
 
 	// Game Screen
 	public static final int IN_GAME_BTN_SIZE = 70;

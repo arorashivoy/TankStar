@@ -6,6 +6,9 @@ import com.arorashivoy.tank_star.Main;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
+import java.util.HashMap;
+
+@SuppressWarnings("FieldMayBeFinal")
 public class Bullets {
 	private final Main app;
 	private final Tank tank;
@@ -15,11 +18,24 @@ public class Bullets {
 	private double powerX, powerY;
 	private int frame = 0;
 
+	private static HashMap<Tank, Bullets> bullets = new HashMap<>();
+
 	private Sprite bulletSprite;
 
-	public Bullets(Main app, Tank tank) {
+	private Bullets(Main app, Tank tank) {
 		this.app = app;
 		this.tank = tank;
+		bullets.put(tank, this);
+	}
+
+	public static Bullets createBullet(Main app, Tank tank) {
+		Bullets bullet = bullets.get(tank);
+		if (bullet == null) {
+			bullet = new Bullets(app, tank);
+			bullets.put(tank, bullet);
+		}
+
+		return bullet;
 	}
 
 	public void show() {
@@ -41,10 +57,12 @@ public class Bullets {
 		x = (powerX * BULLET_UNIT_TIME * frame) + startX;
 		y = (powerY * BULLET_UNIT_TIME * frame) + ((1 / 2f) * GRAVITY.y * BULLET_UNIT_TIME * frame * BULLET_UNIT_TIME * frame) + startY;
 
-		bulletSprite.setPosition((float) x, (float) y);
+		bulletSprite.setPosition((float) x * PPM, (float) y * PPM);
 
 		checkOut();
-		checkCollision();
+		if (frame < FRAME_SKIP) {
+			checkCollision();
+		}
 
 		frame += 1;
 
@@ -55,7 +73,7 @@ public class Bullets {
 	}
 
 	private void checkOut() {
-		if (x > V_WIDTH || x < 0 || y > V_HEIGHT || y < 0) {
+		if (x * PPM > V_WIDTH || x * PPM < 0 || y * PPM > V_HEIGHT || y * PPM < 0) {
 			isVisible = false;
 			tank.setFiring(false);
 		}

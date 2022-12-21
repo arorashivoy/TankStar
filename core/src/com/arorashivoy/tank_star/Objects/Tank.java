@@ -10,7 +10,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
@@ -34,7 +33,7 @@ public class Tank {
 		this.app = app;
 
 		// Bullet
-		bullet = new Bullets(app, this);
+		bullet = Bullets.createBullet(app, this);
 
 
 		// Box2D Body
@@ -135,8 +134,12 @@ public class Tank {
 
 		// Set bullet power
 		if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-			if (power >= 30 && power <= 100) {
-				power -= (player) ? -1 : 1;
+			power -= (player) ? -1 : 1;
+
+			if (power < 30) {
+				power = 30;
+			} else if (power > 100) {
+				power = 100;
 			}
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.D)) {
@@ -155,7 +158,7 @@ public class Tank {
 	}
 
 	public void shoot() {
-		bullet.fire(body.getPosition().x, body.getPosition().y, power * cos(angle), power * sin(angle));
+		bullet.fire(body.getPosition().x, body.getPosition().y, power * cos(toRadians(angle)), power * sin(toRadians(angle)));
 		isFiring = true;
 	}
 
@@ -186,10 +189,12 @@ public class Tank {
 
 	///////////////////////////////////////////////////// HELPERS //////////////////////////////////////////////////////
 	public void checkDamage(float x, float y) {
-		double damageX = pow(2.71, x*x);
-		double damageY = pow(2.71, y*y);
+		x -= body.getPosition().x;
+		y -= body.getPosition().y;
+		double damageX = pow(2.71, -0.5f * (x * x));
+		double damageY = pow(2.71, -0.5f * (y * y));
 
-		health -= (damageX + damageY);
-		System.out.println(damageX + damageY);
+		health -= (damageX + damageY) * DAMAGE_CONST;
+		System.out.println("Damage " + (damageX + damageY) * DAMAGE_CONST + player);
 	}
 }
