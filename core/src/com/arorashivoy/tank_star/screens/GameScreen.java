@@ -20,20 +20,19 @@ public class GameScreen implements Screen {
 	private final Main app;
 	private static final float SCALE = 2f;
 
-	private final Tank tank1;
-	private final Tank tank2;
+	private Tank tank1;
+	private Tank tank2;
 	private boolean player = false;
+	private String tank1addr = "img/Tanks/Frost.PNG";
+	private String tank2addr = "img/Tanks/Frost.PNG";
 
 	private final TextButtonStyle buttonStyle;
 	private TextButton inGameButton;
 
 
 
-
 	public GameScreen(Main app) {
 		this.app = app;
-		tank1 = new Tank(app,false, app.world, SCALE);
-		tank2 = new Tank(app,true, app.world, SCALE);
 
 		// Button
 		buttonStyle = new TextButtonStyle();
@@ -42,29 +41,39 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void show() {
-		Gdx.input.setInputProcessor(app.gameStage);
+		Gdx.input.setInputProcessor(app.getGameStage());
+
+		if (tank1 != null) {
+			app.getWorld().destroyBody(tank1.getBody());
+		}
+		if (tank2 != null) {
+			app.getWorld().destroyBody(tank2.getBody());
+		}
+
+		tank1 = new Tank(app,false, app.getWorld(), SCALE, tank1addr);
+		tank2 = new Tank(app,true, app.getWorld(), SCALE, tank2addr);
 
 		// Background
-		Pixmap bgOriginal = app.assets.get("img/Backgrounds/background.png", Pixmap.class);
+		Pixmap bgOriginal = app.getAssets().get("img/Backgrounds/background.png", Pixmap.class);
 		Pixmap bgResized = new Pixmap(V_WIDTH, V_HEIGHT, bgOriginal.getFormat());
 		bgResized.drawPixmap(bgOriginal, 0, 0, bgOriginal.getWidth(), bgOriginal.getHeight(), 0, 0, bgResized.getWidth(), bgResized.getHeight());
 		Texture bgTex = new Texture(bgResized);
 		bgResized.dispose();
 		Image bg = new Image(bgTex);
 
-		app.gameStage.addActor(bg);
+		app.getGameStage().addActor(bg);
 
 
 		// Pause Button Texture
-		buttonStyle.font = app.font;
-		Pixmap original_up = app.assets.get("img/Buttons/In-game-btn.png", Pixmap.class);
+		buttonStyle.font = app.getFont();
+		Pixmap original_up = app.getAssets().get("img/Buttons/In-game-btn.png", Pixmap.class);
 		Pixmap resized_up = new Pixmap(IN_GAME_BTN_SIZE, IN_GAME_BTN_SIZE, original_up.getFormat());
 		resized_up.drawPixmap(original_up, 0, 0, original_up.getWidth(), original_up.getHeight(), 0, 0, resized_up.getWidth(), resized_up.getHeight());
 		buttonStyle.up = new TextureRegionDrawable(new Texture(resized_up));
 
 		resized_up.dispose();
 
-		Pixmap original_down = app.assets.get("img/Buttons/In-game-btn-down.png", Pixmap.class);
+		Pixmap original_down = app.getAssets().get("img/Buttons/In-game-btn-down.png", Pixmap.class);
 		Pixmap resized_down = new Pixmap(IN_GAME_BTN_SIZE, IN_GAME_BTN_SIZE, original_down.getFormat());
 		resized_down.drawPixmap(original_down, 0, 0, original_down.getWidth(), original_down.getHeight(), 0, 0, resized_down.getWidth(), resized_down.getHeight());
 		buttonStyle.down = new TextureRegionDrawable(new Texture(resized_down));
@@ -76,7 +85,7 @@ public class GameScreen implements Screen {
 		inGameButton.setPosition( 0, V_HEIGHT - IN_GAME_BTN_SIZE - 10);
 
 
-		app.gameStage.addActor(inGameButton);
+		app.getGameStage().addActor(inGameButton);
 
 		tank1.show();
 		tank2.show();
@@ -90,15 +99,15 @@ public class GameScreen implements Screen {
 
 		update(delta);
 
-		app.gameStage.draw();
+		app.getGameStage().draw();
 
-		app.batch.begin();
+		app.getBatch().begin();
 		tank1.drawBullet();
 		tank2.drawBullet();
-		app.batch.end();
+		app.getBatch().end();
 
-		app.mapRenderer.render();
-		app.boxRenderer.render(app.world, app.camera.combined.scl(PPM));
+		app.getMapRenderer().render();
+		app.getBoxRenderer().render(app.getWorld(), app.getCamera().combined.scl(PPM));
 
 
 		tank1.draw(delta);
@@ -109,18 +118,19 @@ public class GameScreen implements Screen {
 		inGameButton.addListener(new ClickListener() {
 			@Override
 			public void clicked (InputEvent event, float x, float y) {
-				System.out.println("Button clicked");
+				app.getPauseScreen().gamePause(tank1, tank2);
+				app.setScreen(app.getPauseScreen());
 			}
 		});
 
-		app.gameStage.act(delta);
+		app.getGameStage().act(delta);
 
-		app.world.step(1 / 60f, 6, 2);
+		app.getWorld().step(1 / 60f, 6, 2);
 		inputUpdate(delta);
 		cameraUpdate();
 
-		app.mapRenderer.setView(app.camera);
-		app.batch.setProjectionMatrix(app.camera.combined);
+		app.getMapRenderer().setView(app.getCamera());
+		app.getBatch().setProjectionMatrix(app.getCamera().combined);
 
 
 		tank1.setChance(!player);
@@ -157,17 +167,17 @@ public class GameScreen implements Screen {
 	}
 
 	private void cameraUpdate() {
-		Vector3 position = app.camera.position;
+		Vector3 position = app.getCamera().position;
 		position.x = (V_WIDTH / SCALE);
 		position.y = (V_HEIGHT / SCALE);
-		app.camera.position.set(position);
+		app.getCamera().position.set(position);
 
-		app.camera.update();
+		app.getCamera().update();
 	}
 
 	@Override
 	public void resize(int width, int height) {
-		app.viewport.update(width, height, false);
+		app.getViewport().update(width, height, false);
 	}
 
 	@Override
@@ -189,6 +199,12 @@ public class GameScreen implements Screen {
 	public void dispose() {
 		tank1.dispose();
 		tank2.dispose();
+	}
+
+
+	public void setTankAddr(String addr1, String addr2) {
+		this.tank1addr = addr1;
+		this.tank2addr = addr2;
 	}
 
 

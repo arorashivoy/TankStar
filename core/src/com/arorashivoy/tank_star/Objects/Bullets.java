@@ -6,10 +6,11 @@ import com.arorashivoy.tank_star.Main;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
-@SuppressWarnings("FieldMayBeFinal")
-public class Bullets {
+//@SuppressWarnings("FieldMayBeFinal")
+public class Bullets implements Serializable {
 	private final Main app;
 	private final Tank tank;
 	private boolean isVisible = false;
@@ -40,7 +41,7 @@ public class Bullets {
 
 	public void show() {
 		// Bullet Texture
-		Texture bulletTex = app.assets.get("img/Bullets/Bullet.png", Texture.class);
+		Texture bulletTex = app.getAssets().get("img/Bullets/Bullet.png", Texture.class);
 		bulletSprite = new Sprite(bulletTex);
 		bulletSprite.setSize(BULLET_WIDTH, BULLET_HEIGHT);
 	}
@@ -49,7 +50,7 @@ public class Bullets {
 	public void draw() {
 		if (isVisible) {
 			update();
-			bulletSprite.draw(app.batch);
+			bulletSprite.draw(app.getBatch());
 		}
 	}
 
@@ -69,7 +70,7 @@ public class Bullets {
 	}
 
 	private void checkCollision() {
-		app.gameScreen.checkCollision((float) x, (float) y);
+		app.getGameScreen().checkCollision((float) x, (float) y);
 	}
 
 	private void checkOut() {

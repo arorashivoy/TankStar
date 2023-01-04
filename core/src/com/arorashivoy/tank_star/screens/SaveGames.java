@@ -1,6 +1,5 @@
 package com.arorashivoy.tank_star.screens;
 
-import com.arorashivoy.tank_star.Helper.CustomConstants;
 import com.arorashivoy.tank_star.Main;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -9,42 +8,34 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
-public class MainMenu implements Screen {
+import static com.arorashivoy.tank_star.Helper.CustomConstants.V_HEIGHT;
+import static com.arorashivoy.tank_star.Helper.CustomConstants.V_WIDTH;
+
+public class SaveGames implements Screen {
 	private final Main app;
+	private TextButton save1Button;
+	private TextButton save2Button;
+	private TextButton save3Button;
+	private final TextButton.TextButtonStyle textButtonStyle;
 	private final Stage stage;
-	private Texture background = null;
-	private TextButton playButton;
-	private TextButton resumeButton;
-	private final TextButtonStyle textButtonStyle;
 
 	// Public Constants
 	public static int BTN_WIDTH = 200;
 	public static int BTN_HEIGHT = 100;
 
-	public MainMenu(Main app) {
+	public SaveGames(Main app) {
 		this.app = app;
+		textButtonStyle = new TextButton.TextButtonStyle();
 		this.stage = new Stage(app.getViewport());
-		textButtonStyle = new TextButtonStyle();
 	}
+
 
 	@Override
 	public void show() {
 		Gdx.input.setInputProcessor(stage);
-
-		// Importing the background image
-		if (app.getAssets().isLoaded("img/Backgrounds/Main_menu.png") && background == null) {
-			Pixmap original = app.getAssets().get("img/Backgrounds/Main_menu.png", Pixmap.class);
-			Pixmap resized = new Pixmap(CustomConstants.V_WIDTH, CustomConstants.V_HEIGHT, original.getFormat());
-			resized.drawPixmap(original, 0, 0, original.getWidth(), original.getHeight(), 0, 0, resized.getWidth(), resized.getHeight());
-			background = new Texture(resized);
-
-			// Disposing the pixmap
-			resized.dispose();
-		}
 
 		// Importing the button textures
 		if (app.getAssets().isLoaded("img/Buttons/button-up.png") && app.getAssets().isLoaded("img/Buttons/button-down.png") && app.getAssets().isLoaded("img/Buttons/button-hover.png")) {
@@ -73,16 +64,19 @@ public class MainMenu implements Screen {
 			resized_hover.dispose();
 
 
-			playButton = new TextButton("Play", textButtonStyle);
-			playButton.setPosition(650,350);
+			save2Button = new TextButton("2", textButtonStyle);
+			save2Button.setPosition(V_WIDTH / 2f, V_HEIGHT / 2f - 100);
 
-			resumeButton = new TextButton("Resume", textButtonStyle);
-			resumeButton.setPosition(650,200);
+			save1Button = new TextButton("1", textButtonStyle);
+			save1Button.setPosition(V_WIDTH / 2f, V_HEIGHT / 2f);
 
-			stage.addActor(playButton);
-			stage.addActor(resumeButton);
+			save3Button = new TextButton("3", textButtonStyle);
+			save3Button.setPosition(V_WIDTH / 2f, V_HEIGHT / 2f - 200);
+
+			stage.addActor(save1Button);
+			stage.addActor(save2Button);
+			stage.addActor(save3Button);
 		}
-
 	}
 
 	@Override
@@ -92,29 +86,39 @@ public class MainMenu implements Screen {
 
 		update(delta);
 
-		app.getBatch().begin();
-		// draw the stuff in SpriteBatch here
-		app.getBatch().draw(background, 0, 0);
-		app.getBatch().end();
-
-		// Drawing stage actors
 		stage.draw();
 	}
 
 	private void update(float delta) {
-		playButton.addListener(new ChangeListener() {
+		save1Button.addListener(new ChangeListener() {
 			@Override
-			public void changed (ChangeEvent event, Actor actor) {
-//				app.setScreen(app.getGameScreen());
-				app.setScreen(new ChooseTank(app));
+			public void changed(ChangeEvent event, Actor actor) {
+				// TODO Load game
+
+				app.setScreen(app.getGameScreen());
 			}
 		});
+
+		save2Button.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+
+			}
+		});
+
+		save3Button.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+
+			}
+		});
+
 		stage.act(delta);
 	}
 
 	@Override
 	public void resize(int width, int height) {
-		app.getViewport().update(width, height, false);
+
 	}
 
 	@Override
@@ -134,7 +138,6 @@ public class MainMenu implements Screen {
 
 	@Override
 	public void dispose() {
-		background.dispose();
-		stage.dispose();
+
 	}
 }

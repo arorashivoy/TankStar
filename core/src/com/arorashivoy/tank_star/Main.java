@@ -1,5 +1,6 @@
 package com.arorashivoy.tank_star;
 
+import com.arorashivoy.tank_star.Objects.Tank;
 import com.arorashivoy.tank_star.screens.*;
 import com.arorashivoy.tank_star.Helper.*;
 import com.badlogic.gdx.Game;
@@ -20,24 +21,29 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-public class Main extends Game {
-	public SpriteBatch batch;
-	public OrthographicCamera camera;
-	public Viewport viewport;
-	public AssetManager assets;
-	public BitmapFont font;
-	public ShapeRenderer shapeRenderer;
+import java.util.LinkedList;
 
-	public Stage gameStage;
-	public Box2DDebugRenderer boxRenderer;
-	public World world;
-	public OrthogonalTiledMapRenderer mapRenderer;
-	public TiledMap map;
+public class Main extends Game {
+	private SpriteBatch batch;
+	private OrthographicCamera camera;
+	private Viewport viewport;
+	private AssetManager assets;
+	private BitmapFont font;
+	private ShapeRenderer shapeRenderer;
+
+	private Stage gameStage;
+	private Box2DDebugRenderer boxRenderer;
+	private World world;
+	private OrthogonalTiledMapRenderer mapRenderer;
+	private TiledMap map;
 
 	////////////////////////////////////////////////////// Screens /////////////////////////////////////////////////////
-	public MainMenu mainMenu;
-	public SplashScreen splashScreen;
-	public GameScreen gameScreen;
+	private MainMenu mainMenu;
+	private SplashScreen splashScreen;
+	private GameScreen gameScreen;
+	private PauseScreen pauseScreen;
+
+	private LinkedList<LinkedList<Tank>> saves = new LinkedList<>();
 
 	@Override
 	public void create() {
@@ -60,6 +66,7 @@ public class Main extends Game {
 		splashScreen = SplashScreen.getInstance(this);
 		mainMenu = new MainMenu(this);
 		gameScreen = new GameScreen(this);
+		pauseScreen = new PauseScreen(this);
 
 		initFonts();
 
@@ -96,5 +103,68 @@ public class Main extends Game {
 		params.size = 24;
 		params.color = Color.BLACK;
 		font = generator.generateFont(params);
+	}
+
+	public void saveGame(Tank tank1, Tank tank2) {
+		LinkedList<Tank> tanks = new LinkedList<>();
+		tanks.add(tank1);
+		tanks.addLast(tank2);
+		saves.addFirst(tanks);
+	}
+
+	////////////////////////////////////////////////// Getter Setter ///////////////////////////////////////////////////
+
+	public SpriteBatch getBatch() {
+		return batch;
+	}
+
+	public OrthographicCamera getCamera() {
+		return camera;
+	}
+
+	public Viewport getViewport() {
+		return viewport;
+	}
+
+	public AssetManager getAssets() {
+		return assets;
+	}
+
+	public BitmapFont getFont() {
+		return font;
+	}
+
+	public ShapeRenderer getShapeRenderer() {
+		return shapeRenderer;
+	}
+
+	public Stage getGameStage() {
+		return gameStage;
+	}
+
+	public Box2DDebugRenderer getBoxRenderer() {
+		return boxRenderer;
+	}
+
+	public World getWorld() {
+		return world;
+	}
+
+	public OrthogonalTiledMapRenderer getMapRenderer() {
+		return mapRenderer;
+	}
+
+
+	public MainMenu getMainMenu() {
+		return mainMenu;
+	}
+
+
+	public GameScreen getGameScreen() {
+		return gameScreen;
+	}
+
+	public PauseScreen getPauseScreen() {
+		return pauseScreen;
 	}
 }

@@ -16,24 +16,26 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
 public class Tank {
-	private final Main app;
-	private final boolean player;
-	private final Body body;
+	private Main app;
+	private boolean player;
+	private Body body;
 	private Sprite tankSprite;
 	private boolean chance = true;
 	private float angle;
 	private float power = 50f;
 	private float health = INITIAL_HEALTH;
 	private float fuel = INITIAL_FUEL;
-	private final Bullets bullet;
+	private Bullets bullet;
 	private boolean isFiring = false;
+ 	private String addr = "img/Tanks/Frost.PNG";
 
-	public Tank(Main app, boolean player, World world, float SCALE) {
+	public Tank(Main app, boolean player, World world, float SCALE, String addr) {
 		this.player = player;
 		this.app = app;
 
 		// Bullet
 		bullet = Bullets.createBullet(app, this);
+		this.addr = addr;
 
 
 		// Box2D Body
@@ -60,7 +62,7 @@ public class Tank {
 
 	public void show() {
 		// Tank Texture
-		Texture tankTex = app.assets.get("img/Tanks/Frost.PNG", Texture.class);
+		Texture tankTex = app.getAssets().get(addr, Texture.class);
 		tankSprite = new Sprite(tankTex);
 
 		if (player) {
@@ -79,30 +81,30 @@ public class Tank {
 
 		// For shooting
 		if (chance) {
-			app.shapeRenderer.setProjectionMatrix(app.camera.combined);
-			app.shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-			app.shapeRenderer.setColor(Color.GRAY);
-			app.shapeRenderer.rect(body.getPosition().x, body.getPosition().y, 0, 0, power / PPM, 2 / PPM, 1f, 1f, angle);
-			app.shapeRenderer.end();
+			app.getShapeRenderer().setProjectionMatrix(app.getCamera().combined);
+			app.getShapeRenderer().begin(ShapeRenderer.ShapeType.Filled);
+			app.getShapeRenderer().setColor(Color.GRAY);
+			app.getShapeRenderer().rect(body.getPosition().x, body.getPosition().y, 0, 0, power / PPM, 2 / PPM, 1f, 1f, angle);
+			app.getShapeRenderer().end();
 		}
 
 		// Health bar
-		app.shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-		app.shapeRenderer.setColor(Color.BLUE);
-		app.shapeRenderer.rect((player ? 500 : 150) / PPM, (V_HEIGHT - 50) / PPM, 0, 0, health * 3 / PPM, 20 / PPM, 1f, 1f, 0f);
-		app.shapeRenderer.end();
+		app.getShapeRenderer().begin(ShapeRenderer.ShapeType.Filled);
+		app.getShapeRenderer().setColor(Color.BLUE);
+		app.getShapeRenderer().rect((player ? 500 : 150) / PPM, (V_HEIGHT - 50) / PPM, 0, 0, health * 3 / PPM, 20 / PPM, 1f, 1f, 0f);
+		app.getShapeRenderer().end();
 
 
 		// fuel bar
-		app.shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-		app.shapeRenderer.setColor(Color.YELLOW);
-		app.shapeRenderer.rect((player ? V_WIDTH - 50 - INITIAL_FUEL : 50) / PPM, 10 / PPM, 0, 0, fuel / PPM, 20 / PPM, 1f, 1f, 0f);
-		app.shapeRenderer.end();
+		app.getShapeRenderer().begin(ShapeRenderer.ShapeType.Filled);
+		app.getShapeRenderer().setColor(Color.YELLOW);
+		app.getShapeRenderer().rect((player ? V_WIDTH - 50 - INITIAL_FUEL : 50) / PPM, 10 / PPM, 0, 0, fuel / PPM, 20 / PPM, 1f, 1f, 0f);
+		app.getShapeRenderer().end();
 
 
-		app.batch.begin();
-		tankSprite.draw(app.batch);
-		app.batch.end();
+		app.getBatch().begin();
+		tankSprite.draw(app.getBatch());
+		app.getBatch().end();
 	}
 
 

@@ -1,49 +1,51 @@
 package com.arorashivoy.tank_star.screens;
 
-import com.arorashivoy.tank_star.Helper.CustomConstants;
 import com.arorashivoy.tank_star.Main;
+import com.arorashivoy.tank_star.Objects.Tank;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
-public class MainMenu implements Screen {
+import static com.arorashivoy.tank_star.Helper.CustomConstants.*;
+
+public class PauseScreen implements Screen {
 	private final Main app;
-	private final Stage stage;
-	private Texture background = null;
-	private TextButton playButton;
 	private TextButton resumeButton;
-	private final TextButtonStyle textButtonStyle;
+	private TextButton quitButton;
+	private TextButton saveButton;
+	private Sprite backgroundSprite = null;
+	private final TextButton.TextButtonStyle textButtonStyle;
+	private final Stage stage;
+
+	private Tank tank1 = null;
+	private Tank tank2 = null;
 
 	// Public Constants
 	public static int BTN_WIDTH = 200;
 	public static int BTN_HEIGHT = 100;
 
-	public MainMenu(Main app) {
+	public PauseScreen(Main app) {
 		this.app = app;
+		textButtonStyle = new TextButton.TextButtonStyle();
 		this.stage = new Stage(app.getViewport());
-		textButtonStyle = new TextButtonStyle();
 	}
 
 	@Override
 	public void show() {
 		Gdx.input.setInputProcessor(stage);
 
-		// Importing the background image
-		if (app.getAssets().isLoaded("img/Backgrounds/Main_menu.png") && background == null) {
-			Pixmap original = app.getAssets().get("img/Backgrounds/Main_menu.png", Pixmap.class);
-			Pixmap resized = new Pixmap(CustomConstants.V_WIDTH, CustomConstants.V_HEIGHT, original.getFormat());
-			resized.drawPixmap(original, 0, 0, original.getWidth(), original.getHeight(), 0, 0, resized.getWidth(), resized.getHeight());
-			background = new Texture(resized);
+		if (app.getAssets().isLoaded("img/Backgrounds/Pause.png")) {
+			Texture background = app.getAssets().get("img/Backgrounds/Pause.png", Texture.class);
+			backgroundSprite = new Sprite(background);
+			backgroundSprite.setSize(V_WIDTH, V_HEIGHT);
 
-			// Disposing the pixmap
-			resized.dispose();
 		}
 
 		// Importing the button textures
@@ -73,16 +75,19 @@ public class MainMenu implements Screen {
 			resized_hover.dispose();
 
 
-			playButton = new TextButton("Play", textButtonStyle);
-			playButton.setPosition(650,350);
+			saveButton = new TextButton("Save", textButtonStyle);
+			saveButton.setPosition(V_WIDTH / 2f, V_HEIGHT / 2f - 100);
 
 			resumeButton = new TextButton("Resume", textButtonStyle);
-			resumeButton.setPosition(650,200);
+			resumeButton.setPosition(V_WIDTH /2f, V_HEIGHT / 2f);
 
-			stage.addActor(playButton);
+			quitButton = new TextButton("Quit", textButtonStyle);
+			quitButton.setPosition(V_WIDTH /2f, V_HEIGHT / 2f - 200);
+
+			stage.addActor(saveButton);
 			stage.addActor(resumeButton);
+			stage.addActor(quitButton);
 		}
-
 	}
 
 	@Override
@@ -93,22 +98,39 @@ public class MainMenu implements Screen {
 		update(delta);
 
 		app.getBatch().begin();
-		// draw the stuff in SpriteBatch here
-		app.getBatch().draw(background, 0, 0);
+		if (backgroundSprite != null) {
+			backgroundSprite.draw(app.getBatch());
+		}
 		app.getBatch().end();
 
-		// Drawing stage actors
 		stage.draw();
 	}
 
 	private void update(float delta) {
-		playButton.addListener(new ChangeListener() {
+		resumeButton.addListener(new ChangeListener() {
 			@Override
 			public void changed (ChangeEvent event, Actor actor) {
-//				app.setScreen(app.getGameScreen());
-				app.setScreen(new ChooseTank(app));
+				app.setScreen(app.getGameScreen());
 			}
 		});
+
+		quitButton.addListener(new ChangeListener() {
+			@Override
+			public void changed (ChangeEvent event, Actor actor) {
+				app.setScreen(app.getMainMenu());
+			}
+		});
+
+		saveButton.addListener(new ChangeListener() {
+			@Override
+			public void changed (ChangeEvent event, Actor actor) {
+				if (tank1 != null && tank2 != null) {
+					app.saveGame(tank1, tank2);
+				}
+				app.setScreen(app.getMainMenu());
+			}
+		});
+
 		stage.act(delta);
 	}
 
@@ -134,7 +156,12 @@ public class MainMenu implements Screen {
 
 	@Override
 	public void dispose() {
-		background.dispose();
+		backgroundSprite.getTexture().dispose();
 		stage.dispose();
+	}
+
+	public void gamePause(Tank tank1, Tank tank2) {
+		this.tank1 = tank1;
+		this.tank2 = tank2;
 	}
 }

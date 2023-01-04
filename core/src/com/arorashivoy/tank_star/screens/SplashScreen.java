@@ -25,7 +25,7 @@ public class SplashScreen implements Screen {
 
 	private SplashScreen(Main app) {
 		this.app = app;
-		this.stage = new Stage(app.viewport);
+		this.stage = new Stage(app.getViewport());
 		Gdx.input.setInputProcessor(stage);
 
 		// Importing the image
@@ -78,15 +78,15 @@ public class SplashScreen implements Screen {
 	}
 
 	public void update(float delta) {
-		if ((Gdx.input.isKeyPressed(Input.Keys.SPACE) || frame > 150) && app.assets.update() && app.font != null) {
-			app.setScreen(app.mainMenu);
+		if ((Gdx.input.isKeyPressed(Input.Keys.SPACE) || frame > 150) && app.getAssets().update() && app.getFont() != null) {
+			app.setScreen(app.getMainMenu());
 		}
 		stage.act(delta);
 	}
 
 	@Override
 	public void resize(int width, int height) {
-		app.viewport.update(width, height, false);
+		app.getViewport().update(width, height, false);
 	}
 
 	@Override
@@ -115,16 +115,20 @@ public class SplashScreen implements Screen {
 	 * Add all the assets to be preloaded to the asset manager
 	 */
 	private void queueAssets() {
-		app.assets.load("img/Backgrounds/Main_menu.png", Pixmap.class);
-		app.assets.load("img/Buttons/button-up.png", Pixmap.class);
-		app.assets.load("img/Buttons/button-down.png", Pixmap.class);
-		app.assets.load("img/Buttons/button-hover.png", Pixmap.class);
-		app.assets.load("img/Buttons/In_Game_Button.png", Pixmap.class);
-		app.assets.load("img/Buttons/In_Game_Button_hover.png", Pixmap.class);
-		app.assets.load("img/Buttons/In-game-btn.png", Pixmap.class);
-		app.assets.load("img/Buttons/In-game-btn-down.png", Pixmap.class);
-		app.assets.load("img/Tanks/Frost.PNG", Texture.class);
-		app.assets.load("img/Backgrounds/background.png", Pixmap.class);
-		app.assets.load("img/Bullets/Bullet.png", Texture.class);
+		app.getAssets().load("img/Backgrounds/Main_menu.png", Pixmap.class);
+		app.getAssets().load("img/Buttons/button-up.png", Pixmap.class);
+		app.getAssets().load("img/Buttons/button-down.png", Pixmap.class);
+		app.getAssets().load("img/Buttons/button-hover.png", Pixmap.class);
+		app.getAssets().load("img/Buttons/In_Game_Button.png", Pixmap.class);
+		app.getAssets().load("img/Buttons/In_Game_Button_hover.png", Pixmap.class);
+		app.getAssets().load("img/Buttons/In-game-btn.png", Pixmap.class);
+		app.getAssets().load("img/Buttons/In-game-btn-down.png", Pixmap.class);
+		app.getAssets().load("img/Tanks/Frost.PNG", Texture.class);
+		app.getAssets().load("img/Tanks/Tank5.PNG", Texture.class);
+		app.getAssets().load("img/Backgrounds/background.png", Pixmap.class);
+		app.getAssets().load("img/Bullets/Bullet.png", Texture.class);
+		app.getAssets().load("img/Backgrounds/Pause.png", Texture.class);
+		app.getAssets().load("img/Backgrounds/ChooseTank.png", Texture.class);
+		app.getAssets().load("img/Tanks/Tank2.png", Texture.class);
 	}
 }
